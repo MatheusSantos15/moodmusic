@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from app.schemas.song import SongCreate
 
 app = FastAPI()
@@ -20,3 +20,19 @@ def criar_musica(song: SongCreate):
     }
     musicas.append(nova_musica)
     return nova_musica
+
+@app.get("/songs")
+def listar_musicas():
+    return musicas
+
+@app.get("/songs/{song_id}")
+def buscar_musica(song_id: int):
+    for musica in musicas:
+        if musica["id"] == song_id:
+            return musica
+        
+    raise HTTPException(
+        status_code=404,
+        detail = "Música não encontrada"
+    )
+
