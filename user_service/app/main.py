@@ -1,12 +1,49 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Header, HTTPException, Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from jose import jwt
 from app.database import get_connection
-from app.schemas.user import UserCreate, MoodUpdate
+from app.schemas.user import UserCreate, MoodUpdate,LoginRequest
+
 
 app = FastAPI()
 
 usuarios = []
 
+SECRET_KEY = "moodmusic123456"
+ALGORITHM = "HS256"
 
+security = HTTPBearer()
+
+def create_access_token(data: dict):
+
+    token = jwt.encode(
+        data,
+        SECRET_KEY,
+        algorithm = ALGORITHM
+    )
+    return token
+
+def verify_token(token: str):
+
+    payload =jwt.decode(
+        token,
+        SECRET_KEY,
+        algorithms = [ALGORITHM]
+    )
+
+    return payload
+
+def get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+
+    token = credentials.credentials
+
+    print("TOKEN:", token)
+
+    payload = verify_token(token)
+
+    return payload
 
 @app.get("/")
 def raiz():
@@ -20,11 +57,11 @@ def criar_usuario(user: UserCreate):
     
     cursor.execute(
         """
-        INSERT INTO users (nome, humor)
-        VALUES (%s, %s)
+        INSERT INTO users (nome, humor, senha)
+        VALUES (%s, %s, %s)
         RETURNING id;
         """,
-        (user.nome, "neutro")
+        (user.nome, "neutro", user.senha)
     )
     user_id = cursor.fetchone()[0]
     conn.commit()
@@ -38,6 +75,48 @@ def criar_usuario(user: UserCreate):
         "humor": "neutro"
     }
 
+@app.post("/login")
+def login(user: LoginRequest):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        """
+        SELECT id, nome
+        FROM users
+        WHERE nome = %s
+        AND senha = %s
+        """,
+        (user.nome, user.senha)
+    )
+
+    usuario = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    if usuario is None:
+        return {
+            "erro": "Usuário ou senha inválidos"
+        }
+    token = create_access_token(
+        {
+            "sub": user.nome
+        }
+    )
+    return {
+        "access_token": token
+    }
+
+@app.get("/token-test")
+def token_test(token: str):
+
+    payload = verify_token(token)
+
+    return{
+        "payload": payload
+    }
 
 @app.get("/users")
 def listar_usuarios():
@@ -84,7 +163,11 @@ def buscar_usuario(id: int):
 
 
 @app.put("/users/{id}/mood")
-def atualizar_humor(id: int, mood: MoodUpdate):
+def atualizar_humor(
+    id: int,
+    mood: MoodUpdate,
+    current_user = Depends(get_current_user)
+):
 
     conn = get_connection()
     cursor = conn.cursor()
@@ -114,3 +197,4 @@ def atualizar_humor(id: int, mood: MoodUpdate):
         }
 
     return {"erro": "Usuário não encontrado"}
+
