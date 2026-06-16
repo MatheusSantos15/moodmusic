@@ -102,7 +102,8 @@ def login(user: LoginRequest):
         }
     token = create_access_token(
         {
-            "sub": user.nome
+            "user_id": usuario[0],
+            "nome": usuario[1]
         }
     )
     return {
@@ -119,7 +120,9 @@ def token_test(token: str):
     }
 
 @app.get("/users")
-def listar_usuarios():
+def listar_usuarios(
+    current_user = Depends(get_current_user)
+):
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM users ORDER BY id")
@@ -140,7 +143,10 @@ def listar_usuarios():
 
 
 @app.get("/users/{id}")
-def buscar_usuario(id: int):
+def buscar_usuario(
+    id: int,
+    current_user = Depends(get_current_user)
+):
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -198,3 +204,28 @@ def atualizar_humor(
 
     return {"erro": "Usuário não encontrado"}
 
+@app.get("/internal/users/{id}")
+def buscar_usuario_interno(id: int):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "SELECT * FROM users WHERE id = %s",
+        (id,)
+    )
+
+    usuario = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    if usuario:
+        return {
+            "id": usuario[0],
+            "nome": usuario[1],
+            "humor": usuario[2]
+        }
+    
+    return{
+        "erro": "Usuário não encontrado"
+    }

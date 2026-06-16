@@ -11,7 +11,7 @@ def raiz():
 def recomendar(user_id: int):
 
     resposta_usuario = requests.get(
-        f"http://127.0.0.1:8000/users/{user_id}"
+        f"http://127.0.0.1:8000/internal/users/{user_id}"
     )
 
     usuario = resposta_usuario.json()
