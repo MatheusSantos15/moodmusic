@@ -1,7 +1,14 @@
 from fastapi import FastAPI
 import requests
+from kafka import KafkaProducer
+import json
 
 app = FastAPI()
+
+producer = KafkaProducer(
+    bootstrap_servers="localhost:9092",
+    value_serializer=lambda v: json.dumps(v).encode("utf-8")
+)
 
 @app.get("/")
 def raiz():
@@ -28,9 +35,10 @@ def recomendar(user_id: int):
     musicas = resposta_musicas.json()
 
     if len(musicas) > 0:
-        requests.post(
-            "http://127.0.0.1:8002/history",
-            json={
+
+        producer.send(
+            "recommendations",
+            {
                 "user_id": user_id,
                 "song_id": musicas[0]["id"]
             }
