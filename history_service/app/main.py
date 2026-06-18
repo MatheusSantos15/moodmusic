@@ -7,16 +7,19 @@ import threading
 
 app = FastAPI()
 
+
 def consumir_recomendacoes():
 
     consumer = KafkaConsumer(
         "recommendations",
-        bootstrap_servers="localhost:9092",
-        value_deserializer=lambda m: json.loads(m.decode("utf-8"))
+        bootstrap_servers="host.docker.internal:9092",
+        value_deserializer=lambda m: json.loads(m.decode("utf-8")),
+        auto_offset_reset="earliest",
+        group_id="history-service"
     )
 
     for mensagem in consumer:
-        
+
         dados = mensagem.value
 
         conn = get_connection()
@@ -41,10 +44,14 @@ def consumir_recomendacoes():
 
         print(f"Histórico salvo via Kafka: {dados}")
 
+print("Vou iniciar a thread Kafka")
+
 threading.Thread(
     target=consumir_recomendacoes,
     daemon=True
 ).start()
+
+print("Thread Kafka iniciada")
 
 historicos = []
 

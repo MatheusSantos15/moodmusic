@@ -6,7 +6,7 @@ import json
 app = FastAPI()
 
 producer = KafkaProducer(
-    bootstrap_servers="localhost:9092",
+    bootstrap_servers="host.docker.internal:9092",
     value_serializer=lambda v: json.dumps(v).encode("utf-8")
 )
 
@@ -18,7 +18,7 @@ def raiz():
 def recomendar(user_id: int):
 
     resposta_usuario = requests.get(
-        f"http://127.0.0.1:8000/internal/users/{user_id}"
+        f"http://host.docker.internal:8000/internal/users/{user_id}"
     )
 
     usuario = resposta_usuario.json()
@@ -29,7 +29,7 @@ def recomendar(user_id: int):
     humor = usuario["humor"]
 
     resposta_musicas = requests.get(
-        f"http://127.0.0.1:8001/songs/mood/{humor}"
+        f"http://host.docker.internal:8001/songs/mood/{humor}"
     )
 
     musicas = resposta_musicas.json()
