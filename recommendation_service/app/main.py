@@ -1,9 +1,12 @@
 from fastapi import FastAPI
 import requests
 from kafka import KafkaProducer
+from prometheus_fastapi_instrumentator import Instrumentator
 import json
 
 app = FastAPI()
+
+Instrumentator().instrument(app).expose(app)
 
 producer = KafkaProducer(
     bootstrap_servers="host.docker.internal:9092",

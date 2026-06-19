@@ -2,11 +2,13 @@ from fastapi import FastAPI
 from app.database import get_connection
 from app.schemas.history import HistoryCreate
 from kafka import KafkaConsumer
+from prometheus_fastapi_instrumentator import Instrumentator
 import json
 import threading
 
 app = FastAPI()
 
+Instrumentator().instrument(app).expose(app)
 
 def consumir_recomendacoes():
 

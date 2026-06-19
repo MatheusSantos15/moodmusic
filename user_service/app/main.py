@@ -1,11 +1,14 @@
 from fastapi import FastAPI, Header, HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import jwt
+from prometheus_fastapi_instrumentator import Instrumentator
 from app.database import get_connection
 from app.schemas.user import UserCreate, MoodUpdate,LoginRequest
 
 
 app = FastAPI()
+
+Instrumentator().instrument(app).expose(app)
 
 usuarios = []
 

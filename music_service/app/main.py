@@ -1,8 +1,11 @@
 from fastapi import FastAPI, HTTPException
+from prometheus_fastapi_instrumentator import Instrumentator
 from app.database import get_connection
 from app.schemas.song import SongCreate
 
 app = FastAPI()
+
+Instrumentator().instrument(app).expose(app)
 
 musicas = []
 

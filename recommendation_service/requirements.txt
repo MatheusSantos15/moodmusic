@@ -2,3 +2,4 @@ fastapi
 uvicorn
 requests
 kafka-python
+prometheus-fastapi-instrumentator
