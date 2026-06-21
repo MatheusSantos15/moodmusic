@@ -6,7 +6,7 @@ O sistema doi criado com o objetivo de ser didático, utilizando técnicas moder
 
 ## Demonstração
 A demonstração completa do sistema pode ser acessada através do vídeo abaixo:
-*Video de Demonstração:* (LINK)
+*Video de Demonstração:* https://youtu.be/1uyrAKSs9Q4
 
 ## Arquitetura
 
