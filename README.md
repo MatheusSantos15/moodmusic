@@ -164,6 +164,23 @@ Antes de iniciar o projeto é necessário possuir instalado:
 - Docker Compose
 
 ### Clonar o Repositório
-git clone https://github.com/seu-usuario/moodmusic.git
+git clone https://github.com/MatheusSantos15/moodmusic.git
 cd moodmusic
+
+### Iniciar a Aplicação
+docker compose up --build
+
+### Acessar os Serviços
+| Serviço                | URL                                                      |
+| ---------------------- | -------------------------------------------------------- |
+| User Service           | [http://localhost:8000/docs](http://localhost:8000/docs) |
+| Music Service          | [http://localhost:8001/docs](http://localhost:8001/docs) |
+| History Service        | [http://localhost:8002/docs](http://localhost:8002/docs) |
+| Recommendation Service | [http://localhost:8003/docs](http://localhost:8003/docs) |
+| Grafana                | [http://localhost:3000](http://localhost:3000)           |
+| Prometheus             | [http://localhost:9090](http://localhost:9090)           |
+
+## Autor
+### Matheus Santos do Nascimento 
+Projeto desenvolvido para a disciplina de Desenvolvimento de APIs e Microsserviços, aplicando conceitos de arquitetura distribupida, comunicação entre serviços, autenticação, mensageria e observabilidade.
 
